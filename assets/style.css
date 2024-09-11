@@ -15,8 +15,6 @@ main {
 }
 
 section {
-  /* TODO: Enlever la bordure */
-  border: solid 1px #000;
   width: 50%;
   padding: 5px;
   display: flex;
@@ -57,4 +55,34 @@ input {
 
 .result-card p {
   font-weight: bold;
+}
+
+/* Person-details */
+#person-details {
+  display: flex;
+  flex-direction: column;
+}
+
+#photo-identity {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-around;
+}
+
+#identity {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+}
+
+#person-details>p {
+  padding: 20px;
+  text-align: justify;
+}
+
+#person-details img {
+  width: 250px;
+  border-radius: 10px;
+  margin-bottom: 20px;
 }
