@@ -13,14 +13,17 @@ const searchResultDiv = document.getElementById('search-result');
  **/
 
 function createResultCard(data) {
-  // TODO : Changer en fonction de ce que l'API renvoie.
   const resultCard = document.createElement('div');
   searchResultDiv.appendChild(resultCard);
   resultCard.className = 'result-card';
 
   const newImg = new Image();
-  // https://image.tmdb.org/t/p/w200 + lien image
-  newImg.src = data.img;
+  //  + lien image
+  if (!data.profile_path) {
+    newImg.src = "./assets/img/default.jpg"
+  } else {
+    newImg.src = `https://image.tmdb.org/t/p/w200${data.profile_path}`;
+  }
   resultCard.appendChild(newImg);
 
   const newP = document.createElement('p');
@@ -32,21 +35,23 @@ function fetchPerson(searchTerm) {
   fetch(`https://api.themoviedb.org/3/search/person?query=${searchTerm}&api_key=${API_KEY}`)
     .then((response) => {
       response.json()
-        .then((usersData) => {
-          console.log(usersData);
+        .then((personData) => {
+          displaySearchResults(personData);
         });
     });
 }
 
-const ayoData = { img: './assets/img/Ayo-Edebiri-Photo-Credit-Myles-Loftin-2.png', name: 'Ayo Edebiri' };
-const cateData = { img: './assets/img/cate-blanchett.png', name: 'Cate Blanchett' };
+function displaySearchResults(data) {
+  searchResultDiv.textContent = "";
+  for (let i = 0; i < data.results.length; i++) {
+    const person = data.results[i];
+    createResultCard(person);
+  }
+}
 
 /**
  * MAIN SCRIPT
  **/
-
-createResultCard(ayoData);
-createResultCard(cateData);
 
 searchBtn.addEventListener('click', () => {
   fetchPerson(searchInput.value);
