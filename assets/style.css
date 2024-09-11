@@ -18,6 +18,7 @@ section {
   /* TODO: Enlever la bordure */
   border: solid 1px #000;
   width: 50%;
+  padding: 5px;
   display: flex;
   flex-direction: column;
 }
@@ -39,7 +40,7 @@ input {
   border: 1px solid rgb(233, 232, 232);
   border-radius: 10px;
   padding: 15px;
-  margin: 5px;
+  margin-top: 5px;
   display: flex;
   align-items: center;
   gap: 50px;
