@@ -1,4 +1,4 @@
-import API_KEY from "./config.js";
+import API_KEY from "../config.js";
 
 /**
  * VARIABLES
@@ -21,8 +21,12 @@ function createElt(elt, parentElt, text) {
   return newElt;
 }
 
-function parseBirthDate(birthDate) {
+function parseBirthDate(birthday) {
+  // yyyy-mm-dd
+  const birthDate = new Date(birthday);
+  birthday = birthDate.toLocaleString('default', { day: '2-digit', month: 'long', year: 'numeric' });
 
+  return birthday;
 }
 
 function createResultCard(data) {
@@ -31,7 +35,6 @@ function createResultCard(data) {
   resultCard.className = 'result-card';
 
   const newImg = new Image();
-  //  + lien image
   if (!data.profile_path) {
     newImg.src = "./assets/img/default.jpg";
   } else {
@@ -69,7 +72,7 @@ function displayDetails(data) {
   photoIdentityDiv.appendChild(newImg);
 
   createElt('h2', identityDiv, data.name);
-  createElt('p', identityDiv, data.birthday);
+  createElt('p', identityDiv, parseBirthDate(data.birthday));
   createElt('p', identityDiv, data.place_of_birth);
   createElt('p', detailsDiv, data.biography);
 }

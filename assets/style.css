@@ -57,8 +57,9 @@ input {
   font-weight: bold;
 }
 
-/* Person-details */
+/* Person details */
 #person-details {
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
 }
