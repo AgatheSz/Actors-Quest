@@ -33,8 +33,7 @@ function parseBirthDate(birthday) {
 }
 
 function createResultCard(data, parentElt) {
-  const resultCard = document.createElement('div');
-  parentElt.appendChild(resultCard);
+  const resultCard = createElt('div', parentElt, "");
   resultCard.className = 'result-card';
 
   const newImg = new Image();
@@ -46,6 +45,10 @@ function createResultCard(data, parentElt) {
   resultCard.appendChild(newImg);
 
   createElt('p', resultCard, data.name);
+
+  if (data.character) {
+    createElt('p', resultCard, data.character);
+  }
 
   resultCard.addEventListener('click', () => {
     fetchPersonDetails(data.id);
@@ -137,7 +140,7 @@ function displayMovies(data) {
 
     newLi.addEventListener('click', () => {
       fetchMovieCredits(movie.id);
-    })
+    });
   }
 }
 
@@ -147,7 +150,11 @@ function displayTvShows(data) {
   createElt('h2', ulTv, "Séries télévisées");
   for (let i = 0; i < tvData.length; i++) {
     const tvShow = tvData[i];
-    createElt('li', ulTv, tvShow.name);
+    const newLi = createElt('li', ulTv, tvShow.name);
+
+    newLi.addEventListener('click', () => {
+      fetchTvCredits(tvShow.id);
+    });
   }
 }
 
@@ -157,6 +164,16 @@ function displayMovieActors(data) {
 
   for (let i = 0; i < movieCreditsData.length; i++) {
     const person = movieCreditsData[i];
+    createResultCard(person, searchResultDiv);
+  }
+}
+
+function displayTvActors(data) {
+  const tvCreditsData = data.cast;
+  searchResultDiv.textContent = "";
+
+  for (let i = 0; i < tvCreditsData.length; i++) {
+    const person = tvCreditsData[i];
     createResultCard(person, searchResultDiv);
   }
 }
@@ -211,7 +228,15 @@ function fetchMovieCredits(movieId) {
     });
 }
 
-
+function fetchTvCredits(tvShowId) {
+  fetch(`https://api.themoviedb.org/3/tv/${tvShowId}/credits?language=fr-FR&api_key=${API_KEY}`)
+    .then((response) => {
+      response.json()
+        .then((creditsData) => {
+          displayTvActors(creditsData);
+        });
+    });
+}
 
 
 /**
