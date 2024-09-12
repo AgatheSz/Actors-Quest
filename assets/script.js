@@ -32,9 +32,9 @@ function parseBirthDate(birthday) {
   return birthday;
 }
 
-function createResultCard(data) {
+function createResultCard(data, parentElt) {
   const resultCard = document.createElement('div');
-  searchResultDiv.appendChild(resultCard);
+  parentElt.appendChild(resultCard);
   resultCard.className = 'result-card';
 
   const newImg = new Image();
@@ -51,6 +51,7 @@ function createResultCard(data) {
     fetchPersonDetails(data.id);
     fetchMovies(data.id);
     fetchTvShows(data.id);
+    saveSearchHistory(data.name, data.profile_path, data.id);
   });
 }
 
@@ -67,7 +68,43 @@ function displaySearchResults(data) {
   searchResultDiv.textContent = "";
   for (let i = 0; i < data.results.length; i++) {
     const person = data.results[i];
-    createResultCard(person);
+    createResultCard(person, searchResultDiv);
+  }
+}
+
+function saveSearchHistory(name, profile_path, id) {
+  let peopleArr = sessionStorage.getItem("people");
+  if (!peopleArr) {
+    peopleArr = [];
+  } else {
+    peopleArr = JSON.parse(peopleArr);
+
+    peopleArr = peopleArr.filter((person) => {
+      return person.name !== name;
+    });
+  }
+
+  const person = { 'id': id, 'name': name, 'profile_path': profile_path };
+  if (peopleArr.length >= 3) {
+    peopleArr.pop();
+  }
+
+  peopleArr.unshift(person);
+  sessionStorage.setItem("people", JSON.stringify(peopleArr));
+
+  handleHistory()
+}
+
+function handleHistory() {
+  searchHistoryDiv.textContent = "";
+  createElt('h2', searchHistoryDiv, 'Historique');
+
+  let searchHistory = JSON.parse(sessionStorage.getItem("people"));
+
+  if (searchHistory) {
+    for (let i = 0; i < searchHistory.length; i++) {
+      createResultCard(searchHistory[i], searchHistoryDiv);
+    }
   }
 }
 
@@ -96,7 +133,11 @@ function displayMovies(data) {
   createElt('h2', ulMovies, "Films");
   for (let i = 0; i < movieData.length; i++) {
     const movie = movieData[i];
-    createElt('li', ulMovies, movie.title);
+    const newLi = createElt('li', ulMovies, movie.title);
+
+    newLi.addEventListener('click', () => {
+      fetchMovieCredits(movie.id);
+    })
   }
 }
 
@@ -110,6 +151,16 @@ function displayTvShows(data) {
   }
 }
 
+function displayMovieActors(data) {
+  const movieCreditsData = data.cast;
+  searchResultDiv.textContent = "";
+
+  for (let i = 0; i < movieCreditsData.length; i++) {
+    const person = movieCreditsData[i];
+    createResultCard(person, searchResultDiv);
+  }
+}
+
 function fetchPerson(searchTerm) {
   fetch(`https://api.themoviedb.org/3/search/person?query=${searchTerm}&api_key=${API_KEY}`)
     .then((response) => {
@@ -120,8 +171,8 @@ function fetchPerson(searchTerm) {
     });
 }
 
-function fetchPersonDetails(id) {
-  fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=fr-FR`)
+function fetchPersonDetails(personId) {
+  fetch(`https://api.themoviedb.org/3/person/${personId}?api_key=${API_KEY}&language=fr-FR`)
     .then((response) => {
       response.json()
         .then((personData) => {
@@ -130,8 +181,8 @@ function fetchPersonDetails(id) {
     });
 }
 
-function fetchMovies(id) {
-  fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?language=fr-FR&api_key=${API_KEY}`)
+function fetchMovies(personId) {
+  fetch(`https://api.themoviedb.org/3/person/${personId}/movie_credits?language=fr-FR&api_key=${API_KEY}`)
     .then((response) => {
       response.json()
         .then((movieData) => {
@@ -140,8 +191,8 @@ function fetchMovies(id) {
     });
 }
 
-function fetchTvShows(id) {
-  fetch(`https://api.themoviedb.org/3/person/${id}/tv_credits?language=fr-FR&api_key=${API_KEY}`)
+function fetchTvShows(personId) {
+  fetch(`https://api.themoviedb.org/3/person/${personId}/tv_credits?language=fr-FR&api_key=${API_KEY}`)
     .then((response) => {
       response.json()
         .then((tvData) => {
@@ -150,6 +201,19 @@ function fetchTvShows(id) {
     });
 }
 
+function fetchMovieCredits(movieId) {
+  fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?language=fr-FR&api_key=${API_KEY}`)
+    .then((response) => {
+      response.json()
+        .then((creditsData) => {
+          displayMovieActors(creditsData);
+        });
+    });
+}
+
+
+
+
 /**
  * MAIN SCRIPT
  **/
@@ -157,3 +221,5 @@ function fetchTvShows(id) {
 searchBtn.addEventListener('click', () => {
   fetchPerson(searchInput.value);
 });
+
+handleHistory();
