@@ -80,10 +80,35 @@ input {
 #person-details>p {
   padding: 20px;
   text-align: justify;
+  margin: 0;
 }
 
 #person-details img {
   width: 250px;
   border-radius: 10px;
   margin-bottom: 20px;
+}
+
+/* Movies and tv shows */
+#movies-and-tv {
+  display: flex;
+}
+
+#movies-and-tv ul {
+  width: 50%;
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+}
+
+ul li {
+  /* border-radius: 5px; */
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding: 5px;
+}
+
+ul li:hover {
+  background-color: rgb(233, 232, 232);
 }

@@ -7,7 +7,10 @@ import API_KEY from "../config.js";
 const searchBtn = document.querySelector('button');
 const searchInput = document.getElementById('search-bar');
 const searchResultDiv = document.getElementById('search-result');
+const searchHistoryDiv = document.getElementById('search-history');
 const detailsDiv = document.getElementById('person-details');
+const ulMovies = document.querySelector('#movies-and-tv>ul:first-child');
+const ulTv = document.querySelector('#movies-and-tv>ul:last-child');
 
 /**
  * FONCTIONS 
@@ -46,6 +49,8 @@ function createResultCard(data) {
 
   resultCard.addEventListener('click', () => {
     fetchPersonDetails(data.id);
+    fetchMovies(data.id);
+    fetchTvShows(data.id);
   });
 }
 
@@ -56,6 +61,14 @@ function restoreDivs() {
   identityDiv.id = "identity";
 
   return [photoIdentityDiv, identityDiv];
+}
+
+function displaySearchResults(data) {
+  searchResultDiv.textContent = "";
+  for (let i = 0; i < data.results.length; i++) {
+    const person = data.results[i];
+    createResultCard(person);
+  }
 }
 
 function displayDetails(data) {
@@ -75,6 +88,26 @@ function displayDetails(data) {
   createElt('p', identityDiv, parseBirthDate(data.birthday));
   createElt('p', identityDiv, data.place_of_birth);
   createElt('p', detailsDiv, data.biography);
+}
+
+function displayMovies(data) {
+  const movieData = data.cast;
+  ulMovies.textContent = "";
+  createElt('h2', ulMovies, "Films");
+  for (let i = 0; i < movieData.length; i++) {
+    const movie = movieData[i];
+    createElt('li', ulMovies, movie.title);
+  }
+}
+
+function displayTvShows(data) {
+  const tvData = data.cast;
+  ulTv.textContent = "";
+  createElt('h2', ulTv, "Séries télévisées");
+  for (let i = 0; i < tvData.length; i++) {
+    const tvShow = tvData[i];
+    createElt('li', ulTv, tvShow.name);
+  }
 }
 
 function fetchPerson(searchTerm) {
@@ -97,12 +130,24 @@ function fetchPersonDetails(id) {
     });
 }
 
-function displaySearchResults(data) {
-  searchResultDiv.textContent = "";
-  for (let i = 0; i < data.results.length; i++) {
-    const person = data.results[i];
-    createResultCard(person);
-  }
+function fetchMovies(id) {
+  fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?language=fr-FR&api_key=${API_KEY}`)
+    .then((response) => {
+      response.json()
+        .then((movieData) => {
+          displayMovies(movieData);
+        });
+    });
+}
+
+function fetchTvShows(id) {
+  fetch(`https://api.themoviedb.org/3/person/${id}/tv_credits?language=fr-FR&api_key=${API_KEY}`)
+    .then((response) => {
+      response.json()
+        .then((tvData) => {
+          displayTvShows(tvData);
+        });
+    });
 }
 
 /**
