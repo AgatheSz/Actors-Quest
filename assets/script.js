@@ -139,7 +139,7 @@ function displayMovies(data) {
     const newLi = createElt('li', ulMovies, movie.title);
 
     newLi.addEventListener('click', () => {
-      fetchMovieCredits(movie.id);
+      fetchMovieCredits(movie.id, movie.title);
     });
   }
 }
@@ -153,14 +153,15 @@ function displayTvShows(data) {
     const newLi = createElt('li', ulTv, tvShow.name);
 
     newLi.addEventListener('click', () => {
-      fetchTvCredits(tvShow.id);
+      fetchTvCredits(tvShow.id, tvShow.name);
     });
   }
 }
 
-function displayMovieActors(data) {
+function displayMovieActors(data, title) {
   const movieCreditsData = data.cast;
   searchResultDiv.textContent = "";
+  createElt('h2', searchResultDiv, title);
 
   for (let i = 0; i < movieCreditsData.length; i++) {
     const person = movieCreditsData[i];
@@ -168,9 +169,10 @@ function displayMovieActors(data) {
   }
 }
 
-function displayTvActors(data) {
+function displayTvActors(data, name) {
   const tvCreditsData = data.cast;
   searchResultDiv.textContent = "";
+  createElt('h2', searchResultDiv, name);
 
   for (let i = 0; i < tvCreditsData.length; i++) {
     const person = tvCreditsData[i];
@@ -218,22 +220,22 @@ function fetchTvShows(personId) {
     });
 }
 
-function fetchMovieCredits(movieId) {
+function fetchMovieCredits(movieId, title) {
   fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?language=fr-FR&api_key=${API_KEY}`)
     .then((response) => {
       response.json()
         .then((creditsData) => {
-          displayMovieActors(creditsData);
+          displayMovieActors(creditsData, title);
         });
     });
 }
 
-function fetchTvCredits(tvShowId) {
+function fetchTvCredits(tvShowId, name) {
   fetch(`https://api.themoviedb.org/3/tv/${tvShowId}/credits?language=fr-FR&api_key=${API_KEY}`)
     .then((response) => {
       response.json()
         .then((creditsData) => {
-          displayTvActors(creditsData);
+          displayTvActors(creditsData, name);
         });
     });
 }
