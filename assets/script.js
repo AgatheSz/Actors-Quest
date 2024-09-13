@@ -50,6 +50,14 @@ function createResultCard(data, parentElt) {
     createElt('p', resultCard, data.character);
   }
 
+  let star = createElt('spand', resultCard, '');
+
+  displayStar(data.id, star);
+
+  star.addEventListener('click', () => {
+    handleFavouritesClic(data.id, data.name, star);
+  })
+
   resultCard.addEventListener('click', () => {
     fetchPersonDetails(data.id);
     fetchMovies(data.id);
@@ -108,6 +116,32 @@ function handleHistory() {
     for (let i = 0; i < searchHistory.length; i++) {
       createResultCard(searchHistory[i], searchHistoryDiv);
     }
+  }
+}
+
+function drawStar(fillColor) {
+  return `<?xml version="1.0" encoding="utf-8"?>
+<svg width="50px" height="50px" viewBox="0 0 25 25" fill=${fillColor} xmlns="http://www.w3.org/2000/svg">
+<path d="M13 4L15.2747 9.8691L21.5595 10.2188L16.6806 14.1959L18.2901 20.2812L13 16.87L7.70993 20.2812L9.31941 14.1959L4.44049 10.2188L10.7253 9.8691L13 4Z" 
+stroke="#000" stroke-width="0.5"/>
+</svg>`
+}
+
+function displayStar(personId, star) {
+  if (localStorage.getItem(personId)) {
+    star.innerHTML = drawStar('#f3c023');
+  } else {
+    star.innerHTML = drawStar('none');
+  }
+}
+
+function handleFavouritesClic(personId, personName, star) {
+  if (!localStorage.getItem(personId)) {
+    star.innerHTML = drawStar('#f3c023');
+    localStorage.setItem(personId, personName);
+  } else {
+    star.innerHTML = drawStar('none');
+    localStorage.removeItem(personId);
   }
 }
 
@@ -239,7 +273,6 @@ function fetchTvCredits(tvShowId, name) {
         });
     });
 }
-
 
 /**
  * MAIN SCRIPT
