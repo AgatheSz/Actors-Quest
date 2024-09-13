@@ -9,6 +9,7 @@ const searchInput = document.getElementById('search-bar');
 const searchResultDiv = document.getElementById('search-result');
 const searchHistoryDiv = document.getElementById('search-history');
 const detailsDiv = document.getElementById('person-details');
+const aside = document.querySelector('aside');
 const ulMovies = document.querySelector('#movies-and-tv>ul:first-child');
 const ulTv = document.querySelector('#movies-and-tv>ul:last-child');
 
@@ -25,38 +26,39 @@ function createElt(elt, parentElt, text) {
 }
 
 function parseBirthDate(birthday) {
-  // yyyy-mm-dd
   const birthDate = new Date(birthday);
   birthday = birthDate.toLocaleString('default', { day: '2-digit', month: 'long', year: 'numeric' });
 
   return birthday;
 }
 
+function addImage(url, parentElt) {
+  const newImg = new Image();
+  if (!url) {
+    newImg.src = "./assets/img/default.jpg";
+  } else {
+    newImg.src = `https://image.tmdb.org/t/p/w200${url}`;
+  }
+  parentElt.appendChild(newImg);
+}
+
 function createResultCard(data, parentElt) {
   const resultCard = createElt('div', parentElt, "");
   resultCard.className = 'result-card';
-
-  const newImg = new Image();
-  if (!data.profile_path) {
-    newImg.src = "./assets/img/default.jpg";
-  } else {
-    newImg.src = `https://image.tmdb.org/t/p/w200${data.profile_path}`;
-  }
-  resultCard.appendChild(newImg);
-
+  addImage(data.profile_path, resultCard);
   createElt('p', resultCard, data.name);
 
   if (data.character) {
     createElt('p', resultCard, data.character);
   }
 
-  let star = createElt('spand', resultCard, '');
-
+  let star = createElt('span', resultCard, '');
   displayStar(data.id, star);
 
   star.addEventListener('click', () => {
     handleFavouritesClic(data.id, data.name, star);
-  })
+    displayFavourites();
+  });
 
   resultCard.addEventListener('click', () => {
     fetchPersonDetails(data.id);
@@ -142,6 +144,16 @@ function handleFavouritesClic(personId, personName, star) {
   } else {
     star.innerHTML = drawStar('none');
     localStorage.removeItem(personId);
+  }
+}
+
+function displayFavourites() {
+  aside.textContent = "";
+  createElt('h2', aside, 'Liste des favoris');
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const id = localStorage.key(i);
+    createElt('p', aside, localStorage.getItem(id));
   }
 }
 
@@ -283,3 +295,4 @@ searchBtn.addEventListener('click', () => {
 });
 
 handleHistory();
+displayFavourites();
