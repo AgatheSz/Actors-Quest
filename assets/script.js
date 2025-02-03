@@ -176,11 +176,12 @@ stroke=${strokeColor} stroke-width="0.5"/>
  * @param {String} star - étoile de favoris
  **/
 function displayStar(personId, star) {
-  // if (true) {
-  // star.innerHTML = drawStar('#f3c023', '#f3c023');
-  // } else {
-  star.innerHTML = drawStar('none', '#000');
-  // }
+  let favourites = JSON.parse(localStorage.getItem('favourites'));
+  if () {
+    star.innerHTML = drawStar('#f3c023', '#f3c023');
+  } else {
+    star.innerHTML = drawStar('none', '#000');
+  }
 }
 
 /**
@@ -192,19 +193,41 @@ function displayStar(personId, star) {
  * @returns {} 
  **/
 function handleFavouritesClic(personId, personName, url, star) {
-  let favourites = JSON.parse(localStorage.getItem('favourites'));
+  let favourites = localStorage.getItem('favourites');
 
-  if (!favourites[personId]) {
-    favourites[personId] = { name: personName, profile_path: url };
-    star.innerHTML = drawStar('#f3c023');
-    localStorage.setItem('favourites', JSON.stringify(favourites));
+  if (!favourites) {
+
+    favourites = [];
+
   } else {
-    star.innerHTML = drawStar('none');
-    favourites = favourites.filter((personId) => {
-      // objet.hasOwn()
-      return
-    })
+
+    favArr = JSON.parse(favourites);
+
+    favArr + favArr.filter()
+    if (!favArr[personId]) {
+      favArr[personId] = { name: personName, profile_path: url };
+      star.innerHTML = drawStar('#f3c023');
+      localStorage.setItem('favourites', JSON.stringify(favArr));
+
+    } else {
+
+      star.innerHTML = drawStar('none');
+      favArr = favArr.filter((personId) => {
+        // objet.hasOwn()
+        return
+      })
+    }
   }
+
+  peopleArr = peopleArr.filter((person) => {
+    return person.name !== name;
+  });
+}
+
+const person = { 'id': id, 'name': name, 'profile_path': profile_path };
+if (peopleArr.length >= 3) {
+  peopleArr.pop();
+}
 }
 
 /**
