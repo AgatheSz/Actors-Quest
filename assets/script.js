@@ -56,7 +56,7 @@ function createResultCard(data, parentElt) {
   displayStar(data.id, star);
 
   star.addEventListener('click', () => {
-    handleFavouritesClic(data.id, data.name, star);
+    handleFavouritesClic(data.id, data.name, data.profile_path, star);
     displayFavourites();
   });
 
@@ -137,10 +137,10 @@ function displayStar(personId, star) {
   }
 }
 
-function handleFavouritesClic(personId, personName, star) {
+function handleFavouritesClic(personId, personName, personPath, star) {
   if (!localStorage.getItem(personId)) {
     star.innerHTML = drawStar('#f3c023', '#f3c023');
-    localStorage.setItem(personId, personName);
+    localStorage.setItem(personId, JSON.stringify({ 'name': personName, 'profile_path': personPath }));
   } else {
     star.innerHTML = drawStar('none', '#000');
     localStorage.removeItem(personId);
@@ -153,7 +153,14 @@ function displayFavourites() {
 
   for (let i = 0; i < localStorage.length; i++) {
     const id = localStorage.key(i);
-    createElt('p', aside, localStorage.getItem(id));
+    const person = JSON.parse(localStorage.getItem(id));
+
+    createElt('p', aside, person.name).addEventListener('click', () => {
+      fetchPersonDetails(id);
+      fetchMovies(id);
+      fetchTvShows(id);
+      saveSearchHistory(person.name, person.profile_path, id);
+    });
   }
 }
 
@@ -226,8 +233,8 @@ function displayTvActors(data, name) {
   }
 }
 
-function fetchPerson(searchTerm) {
-  fetch(`https://api.themoviedb.org/3/search/person?query=${searchTerm}&api_key=${API_KEY}`)
+function fetchPerson(searchTerm, page) {
+  fetch(`https://api.themoviedb.org/3/search/person?query=${searchTerm}&page=${page}&api_key=${API_KEY}`)
     .then((response) => {
       response.json()
         .then((personData) => {
@@ -291,7 +298,8 @@ function fetchTvCredits(tvShowId, name) {
  **/
 
 searchBtn.addEventListener('click', () => {
-  fetchPerson(searchInput.value);
+  const page = 1;
+  fetchPerson(searchInput.value, page);
 });
 
 handleHistory();
