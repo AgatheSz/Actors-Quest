@@ -7,6 +7,7 @@ import API_KEY from "../config.js";
 const searchBtn = document.querySelector('button');
 const searchInput = document.getElementById('search-bar');
 const searchResultDiv = document.getElementById('search-result');
+const paginationDiv = document.getElementById('pagination');
 const searchHistoryDiv = document.getElementById('search-history');
 const detailsDiv = document.getElementById('person-details');
 const aside = document.querySelector('aside');
@@ -106,6 +107,25 @@ function saveSearchHistory(name, profile_path, id) {
   sessionStorage.setItem("people", JSON.stringify(peopleArr));
 
   handleHistory()
+}
+
+// TODO: Empêcher d'aller en-dessous de 1 et au-dessus du nombre de pages renvoyées par la recherche
+function handlePagination(page, searchTerm) {
+  const buttonPageMinus = createElt('button', paginationDiv, '<');
+  const currentPage = createElt('span', paginationDiv, page);
+  const buttonPagePlus = createElt('button', paginationDiv, '>');
+
+  buttonPageMinus.addEventListener('click', () => {
+    page--;
+    currentPage.innerHTML = page;
+    fetchPerson(searchTerm, page);
+  });
+
+  buttonPagePlus.addEventListener('click', () => {
+    page++;
+    currentPage.innerHTML = page;
+    fetchPerson(searchTerm, page);
+  });
 }
 
 function handleHistory() {
@@ -300,6 +320,7 @@ function fetchTvCredits(tvShowId, name) {
 searchBtn.addEventListener('click', () => {
   const page = 1;
   fetchPerson(searchInput.value, page);
+  handlePagination(page, searchInput.value);
 });
 
 handleHistory();
