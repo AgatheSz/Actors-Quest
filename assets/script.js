@@ -121,28 +121,28 @@ function handleHistory() {
   }
 }
 
-function drawStar(fillColor) {
+function drawStar(fillColor, strokeColor) {
   return `<?xml version="1.0" encoding="utf-8"?>
 <svg width="50px" height="50px" viewBox="0 0 25 25" fill=${fillColor} xmlns="http://www.w3.org/2000/svg">
 <path d="M13 4L15.2747 9.8691L21.5595 10.2188L16.6806 14.1959L18.2901 20.2812L13 16.87L7.70993 20.2812L9.31941 14.1959L4.44049 10.2188L10.7253 9.8691L13 4Z" 
-stroke="#000" stroke-width="0.5"/>
+stroke="${strokeColor}" stroke-width="0.5"/>
 </svg>`
 }
 
 function displayStar(personId, star) {
   if (localStorage.getItem(personId)) {
-    star.innerHTML = drawStar('#f3c023');
+    star.innerHTML = drawStar('#f3c023', '#f3c023');
   } else {
-    star.innerHTML = drawStar('none');
+    star.innerHTML = drawStar('none', '#000');
   }
 }
 
 function handleFavouritesClic(personId, personName, star) {
   if (!localStorage.getItem(personId)) {
-    star.innerHTML = drawStar('#f3c023');
+    star.innerHTML = drawStar('#f3c023', '#f3c023');
     localStorage.setItem(personId, personName);
   } else {
-    star.innerHTML = drawStar('none');
+    star.innerHTML = drawStar('none', '#000');
     localStorage.removeItem(personId);
   }
 }
