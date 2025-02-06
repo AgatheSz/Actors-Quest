@@ -68,6 +68,12 @@ input {
   font-weight: bold;
 }
 
+#pagination {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
 /* Person details */
 #person-details {
   margin-top: 20px;

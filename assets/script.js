@@ -7,11 +7,14 @@ import API_KEY from "../config.js";
 const searchBtn = document.querySelector('button');
 const searchInput = document.getElementById('search-bar');
 const searchResultDiv = document.getElementById('search-result');
+const paginationDiv = document.getElementById('pagination');
 const searchHistoryDiv = document.getElementById('search-history');
 const detailsDiv = document.getElementById('person-details');
 const aside = document.querySelector('aside');
 const ulMovies = document.querySelector('#movies-and-tv>ul:first-child');
 const ulTv = document.querySelector('#movies-and-tv>ul:last-child');
+
+let maxPages;
 
 /**
  * FONCTIONS 
@@ -56,7 +59,7 @@ function createResultCard(data, parentElt) {
   displayStar(data.id, star);
 
   star.addEventListener('click', () => {
-    handleFavouritesClic(data.id, data.name, star);
+    handleFavouritesClic(data.id, data.name, data.profile_path, star);
     displayFavourites();
   });
 
@@ -108,6 +111,30 @@ function saveSearchHistory(name, profile_path, id) {
   handleHistory()
 }
 
+// TODO: Empêcher d'aller au-dessus du nombre de pages renvoyées par la recherche
+function handlePagination(page, searchTerm, maxPages) {
+  paginationDiv.textContent = "";
+  const buttonPageMinus = createElt('button', paginationDiv, '<');
+  const currentPage = createElt('span', paginationDiv, page);
+  const buttonPagePlus = createElt('button', paginationDiv, '>');
+
+  buttonPageMinus.addEventListener('click', () => {
+    if (page > 1) {
+      page--;
+      currentPage.innerHTML = page;
+      fetchPerson(searchTerm, page);
+    }
+  });
+
+  buttonPagePlus.addEventListener('click', () => {
+    if (page < maxPages) {
+      page++;
+      currentPage.innerHTML = page;
+      fetchPerson(searchTerm, page);
+    }
+  });
+}
+
 function handleHistory() {
   searchHistoryDiv.textContent = "";
   createElt('h2', searchHistoryDiv, 'Historique');
@@ -137,10 +164,10 @@ function displayStar(personId, star) {
   }
 }
 
-function handleFavouritesClic(personId, personName, star) {
+function handleFavouritesClic(personId, personName, personPath, star) {
   if (!localStorage.getItem(personId)) {
     star.innerHTML = drawStar('#f3c023', '#f3c023');
-    localStorage.setItem(personId, personName);
+    localStorage.setItem(personId, JSON.stringify({ 'name': personName, 'profile_path': personPath }));
   } else {
     star.innerHTML = drawStar('none', '#000');
     localStorage.removeItem(personId);
@@ -153,7 +180,14 @@ function displayFavourites() {
 
   for (let i = 0; i < localStorage.length; i++) {
     const id = localStorage.key(i);
-    createElt('p', aside, localStorage.getItem(id));
+    const person = JSON.parse(localStorage.getItem(id));
+
+    createElt('p', aside, person.name).addEventListener('click', () => {
+      fetchPersonDetails(id);
+      fetchMovies(id);
+      fetchTvShows(id);
+      saveSearchHistory(person.name, person.profile_path, id);
+    });
   }
 }
 
@@ -226,12 +260,13 @@ function displayTvActors(data, name) {
   }
 }
 
-function fetchPerson(searchTerm) {
-  fetch(`https://api.themoviedb.org/3/search/person?query=${searchTerm}&api_key=${API_KEY}`)
+function fetchPerson(searchTerm, page) {
+  fetch(`https://api.themoviedb.org/3/search/person?query=${searchTerm}&page=${page}&api_key=${API_KEY}`)
     .then((response) => {
       response.json()
         .then((personData) => {
           displaySearchResults(personData);
+          maxPages = personData.total_pages;
         });
     });
 }
@@ -291,7 +326,9 @@ function fetchTvCredits(tvShowId, name) {
  **/
 
 searchBtn.addEventListener('click', () => {
-  fetchPerson(searchInput.value);
+  const page = 1;
+  fetchPerson(searchInput.value, page);
+  setTimeout(() => { handlePagination(page, searchInput.value, maxPages); }, 10);
 });
 
 handleHistory();
