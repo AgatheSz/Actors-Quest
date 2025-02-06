@@ -14,6 +14,8 @@ const aside = document.querySelector('aside');
 const ulMovies = document.querySelector('#movies-and-tv>ul:first-child');
 const ulTv = document.querySelector('#movies-and-tv>ul:last-child');
 
+let maxPages;
+
 /**
  * FONCTIONS 
  **/
@@ -109,22 +111,27 @@ function saveSearchHistory(name, profile_path, id) {
   handleHistory()
 }
 
-// TODO: Empêcher d'aller en-dessous de 1 et au-dessus du nombre de pages renvoyées par la recherche
-function handlePagination(page, searchTerm) {
+// TODO: Empêcher d'aller au-dessus du nombre de pages renvoyées par la recherche
+function handlePagination(page, searchTerm, maxPages) {
+  paginationDiv.textContent = "";
   const buttonPageMinus = createElt('button', paginationDiv, '<');
   const currentPage = createElt('span', paginationDiv, page);
   const buttonPagePlus = createElt('button', paginationDiv, '>');
 
   buttonPageMinus.addEventListener('click', () => {
-    page--;
-    currentPage.innerHTML = page;
-    fetchPerson(searchTerm, page);
+    if (page > 1) {
+      page--;
+      currentPage.innerHTML = page;
+      fetchPerson(searchTerm, page);
+    }
   });
 
   buttonPagePlus.addEventListener('click', () => {
-    page++;
-    currentPage.innerHTML = page;
-    fetchPerson(searchTerm, page);
+    if (page < maxPages) {
+      page++;
+      currentPage.innerHTML = page;
+      fetchPerson(searchTerm, page);
+    }
   });
 }
 
@@ -259,6 +266,7 @@ function fetchPerson(searchTerm, page) {
       response.json()
         .then((personData) => {
           displaySearchResults(personData);
+          maxPages = personData.total_pages;
         });
     });
 }
@@ -320,7 +328,7 @@ function fetchTvCredits(tvShowId, name) {
 searchBtn.addEventListener('click', () => {
   const page = 1;
   fetchPerson(searchInput.value, page);
-  handlePagination(page, searchInput.value);
+  setTimeout(() => { handlePagination(page, searchInput.value, maxPages); }, 10);
 });
 
 handleHistory();
