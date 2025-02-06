@@ -241,6 +241,7 @@ function displayTvShows(data) {
 function displayMovieActors(data, title) {
   const movieCreditsData = data.cast;
   searchResultDiv.textContent = "";
+  paginationDiv.textContent = "";
   createElt('h2', searchResultDiv, title);
 
   for (let i = 0; i < movieCreditsData.length; i++) {
@@ -252,6 +253,7 @@ function displayMovieActors(data, title) {
 function displayTvActors(data, name) {
   const tvCreditsData = data.cast;
   searchResultDiv.textContent = "";
+  paginationDiv.textContent = "";
   createElt('h2', searchResultDiv, name);
 
   for (let i = 0; i < tvCreditsData.length; i++) {
